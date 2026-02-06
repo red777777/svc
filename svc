@@ -59,16 +59,13 @@ do_list() {
     echo -e "${BOLD}Services on $(hostname)${NC}  ${DIM}$(date '+%H:%M')${NC}"
     echo ""
 
-    # Systemd services — only show app/infra services, not system internals
-    # This list is auto-generated from known running services. Edit to add new ones.
+    # Systemd services — only show app/infra services, not system internals.
+    # Customize this list to match your server. Add your own service names here.
     local known_services=(
-        nginx docker fail2ban auditd tailscaled node-exporter wazuh-agent
-        security-alert-monitor cowrie
-        marina-backend marina-frontend marina-backend-dev marina-frontend-dev
-        energy-backbone-backend energy-backbone-frontend
-        automl vereinsregister igmarkt riverpulse sss-wyc vibe-kanban
-        inso-crawler claudecodeui cc-webhook whatsappclient service-inventory
-        crif-mcp crif-multisystem-mcp destatis-mcp skyminder-mcp
+        # Infrastructure — common services (edit to match your setup)
+        nginx docker fail2ban auditd tailscaled node-exporter
+        # Applications — add your app services here
+        # my-app-backend my-app-frontend my-worker
     )
 
     echo -e "${YELLOW}Systemd Services${NC}"
@@ -211,7 +208,7 @@ elif [ $# -eq 1 ]; then
             echo "  svc logs <name>      Tail logs"
             echo "  svc status <name>    Show detailed status"
             echo ""
-            echo "Name matching is fuzzy — 'marina' matches marina-backend, marina-redis, etc."
+            echo "Name matching is fuzzy — 'my-app' matches my-app-backend, my-app-redis, etc."
             ;;
         *)
             do_action status "$1"

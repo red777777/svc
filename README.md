@@ -4,16 +4,16 @@ A single command to manage **all** your services — whether they run as systemd
 
 ```
 $ svc
-Services on production-server  14:32
+Services on my-server  14:32
 
 Systemd Services
   NAME                         STATUS
   nginx                        running
   docker                       running
   fail2ban                     running
-  marina-backend               running
-  energy-backbone-backend      running
-  automl                       running
+  my-app-backend               running
+  my-app-frontend              running
+  my-worker                    running
 
 Docker Containers
   NAME                         STATUS     HEALTH
@@ -35,9 +35,9 @@ Managing a Linux server with a mix of systemd services and Docker containers mea
 # Without svc — you need to remember which is which
 systemctl status nginx
 docker ps | grep redis
-systemctl restart marina-backend
+systemctl restart my-app-backend
 docker restart n8n
-journalctl -u automl -f
+journalctl -u my-worker -f
 docker logs grafana -f
 ```
 
@@ -45,9 +45,9 @@ docker logs grafana -f
 # With svc — one command, auto-detects the type
 svc status nginx
 svc status redis
-svc restart marina-backend
+svc restart my-app-backend
 svc restart n8n
-svc logs automl
+svc logs my-worker
 svc logs grafana
 ```
 
@@ -96,7 +96,7 @@ Systemd services and Docker containers are listed in separate sections. The syst
 
 ```bash
 svc start nginx
-svc stop marina-backend-dev
+svc stop my-app-dev
 svc restart n8n
 ```
 
@@ -105,9 +105,9 @@ Works the same regardless of whether the service is systemd or Docker. `svc` fig
 ### View logs
 
 ```bash
-svc logs grafana        # Tails Docker logs
-svc logs nginx          # Tails journalctl
-svc logs marina-backend # Tails journalctl
+svc logs grafana         # Tails Docker logs
+svc logs nginx           # Tails journalctl
+svc logs my-app-backend  # Tails journalctl
 ```
 
 Automatically uses `journalctl -f` for systemd services and `docker logs -f` for containers. Shows the last 50 lines and follows new output. Press `Ctrl+C` to exit.
@@ -125,7 +125,7 @@ For Docker containers, shows a compact summary:
 ```
 Name:    /redis
 State:   running
-Started: 2026-02-06T17:43:38Z
+Started: 2026-01-15T10:30:00Z
 Image:   redis:7-alpine
 Ports:   6379/tcp→127.0.0.1:6379
 Health:  healthy
@@ -150,22 +150,20 @@ svc -h
 If multiple services match a keyword, `svc` lists them and asks you to be more specific:
 
 ```bash
-$ svc restart marina
-Multiple matches for 'marina':
-  marina-backend (systemd)
-  marina-frontend (systemd)
-  marina-backend-dev (systemd)
-  marina-frontend-dev (systemd)
-  marina-api (docker)
-  marina-postgres (docker)
-  marina-redis (docker)
+$ svc restart my-app
+Multiple matches for 'my-app':
+  my-app-backend (systemd)
+  my-app-frontend (systemd)
+  my-app-dev (systemd)
+  my-app-postgres (docker)
+  my-app-redis (docker)
 
 Be more specific.
 ```
 
 ```bash
-$ svc restart marina-backend
-Restarting marina-backend (systemd)...
+$ svc restart my-app-backend
+Restarting my-app-backend (systemd)...
 Done
 ```
 
@@ -184,11 +182,11 @@ Find the `known_services` array and modify it:
 ```bash
 local known_services=(
     # Infrastructure
-    nginx docker fail2ban auditd tailscaled node-exporter wazuh-agent
+    nginx docker fail2ban auditd tailscaled node-exporter
 
     # Your apps
-    marina-backend marina-frontend
-    my-new-app          # <-- add your services here
+    my-app-backend my-app-frontend
+    my-new-service          # <-- add your services here
 )
 ```
 
@@ -229,17 +227,17 @@ svc status postgresql
 svc logs postgresql
 
 # Deploy a new version — restart the app
-svc restart marina-backend
-svc restart marina-frontend
+svc restart my-app-backend
+svc restart my-app-frontend
 
 # Debug a container issue
 svc logs n8n
 
 # Stop a dev service to free resources
-svc stop marina-backend-dev
+svc stop my-app-dev
 
 # Bring it back
-svc start marina-backend-dev
+svc start my-app-dev
 ```
 
 ## Comparison with Alternatives
